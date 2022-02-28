@@ -1,0 +1,186 @@
+@page "/R_PRoductos"
+@using Blazor.Entidades;
+@using Blazor.BLL;
+
+<EditForm Model="productos" OnValidSubmit="Guardar" >
+    <DataAnnotationsValidator />
+    <div class="card">
+        <div class="card-header">
+            <h3>Registro de Productos</h3>
+        </div>
+        <div class="card-body">
+            <form>
+                @*Producto id*@
+                <div class="form-row align-items-center">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Productoid</label>
+                            <div class="input-group">
+                                <InputNumber @bind-Value="productos.ProductoId" class="form-control col-4" />
+                                <div>
+                                    <button type="submit" class="btn btn-primary input-group-text">Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* Descricion *@
+                <div class="form-group">
+                    <label>Descricion</label>
+                    <InputText class="form-control" @bind-Value="productos.Descripcion" />
+                    <ValidationMessage For="@(() =>productos.Descripcion)" />
+                </div>
+                @* Costo *@
+                <div class="form-group">
+                    <label>Costo</label>
+                    <InputNumber class="form-control" @bind-Value="productos.Costo" />
+                    <ValidationMessage For="@(() =>productos.Costo)" />
+                </div>
+                <div class="form-row align-items-center">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Ganancia</label>
+                            <div class="input-group">
+                                <InputNumber class="form-control" @bind-Value="productos.Ganancia" />
+                                <div>
+                                    <label>%</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Precio</label>
+                    <InputNumber class="form-control" @bind-Value="productos.Precio" />
+                </div>
+            </form>
+            <div class="form-group text-center" display: inline-block>
+                <button type="button" class="btn btn-lg btn-primary" @onclick="Nuevo">Nuevo</button>
+                <button type="submit" class="btn btn-lg btn-success">Guardar</button>
+                <button type="button" class="btn btn-lg btn-danger" @onclick="Eliminar">Eliminar</button>
+            </div>
+
+
+
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3>Detalle de Productos</h3>
+            </div>
+            <div>
+                <form>
+                    <div class="input-group d-flex align-items-end">
+                        <div class="flex-fill mx-2">
+                            <label>Descripcion</label>
+                            <input type="text" class="form-control" @bind-value="CantidadP" />
+                        </div>
+                        <div>
+                            <label>Cantidad</label>
+                            <input type="text" class="form-control" @bind-value="PrecioP" />
+                        </div>
+                        <div>
+                            <label>Precio</label>
+                            <input type="text" class="form-control" @bind-value="PrecioP">
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-lg btn-primary"
+                                @onclick="AgregarDetalle">Agregar</button>
+                        </div>
+                    </div>
+                </form>
+                <div>
+                    <div>
+                        <table class="table table-secondary">
+                            <thead class="thead-darck">
+                                <tr class="table-info">
+                                    <th>Descripcion</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in productos.DetalleProducto)
+                                {
+                                    <tr>
+                                        <td>@item.Descripcion</td>
+                                        <td>@item.Cantidad</td>
+                                        <td>@item.Precio</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    Productos productos = new Productos();
+    DetalleProducto detalleProducto = new DetalleProducto();
+
+    public int CantidadP { get; set; }
+    public int PrecioP { get; set; }
+    public string? DescripcionP { get; set; }
+
+    private void Nuevo()
+    {
+        productos = new Productos();
+    }
+
+    private void AgregarDetalle()
+    {
+
+    }
+    public void Guardar()
+    {
+
+        if (!ProductoBLL.Existe(productos.ProductoId))
+        {
+            if (!ProductoBLL.Existe(productos.Descripcion))
+            {
+                double precio = 0, Precio_Total = 0, porcentaje = 0;
+                porcentaje = (productos.Ganancia / 100);
+                precio = productos.Costo * porcentaje;
+                Precio_Total = productos.Costo + precio;
+                productos.Precio = Precio_Total;
+
+                ProductoBLL.Guardar(productos);
+                Nuevo();
+
+            }
+            else
+            {
+
+            }
+
+        }
+        else
+        {
+
+        }
+
+    }
+
+    private void Buscar()
+    {
+        var encontrado = ProductoBLL.Buscar(this.productos.ProductoId);
+        if (encontrado != null)
+        {
+            this.productos = encontrado;
+
+        }
+        else
+        {
+
+        }
+    }
+
+    private void Eliminar()
+    {
+        ProductoBLL.Eliminar(productos.ProductoId);
+        Nuevo();
+    }
+}
