@@ -7,7 +7,6 @@ using Blazor.Entidades;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Blazor.BLL
 {
     public class ProductoBLL
